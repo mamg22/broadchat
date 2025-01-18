@@ -13,10 +13,8 @@ type Message = {
 
 function ChatLog({ messages }: { messages: Message[] }) {
   const messages_elts = messages.map(function(message) {
-    const time = message.time.toLocaleTimeString("en-US", { hour: 'numeric', minute: 'numeric' }).toLowerCase();
     return (
       <div className="chat-message" key={message.id}>
-        <span className="chat-message-time">[{time}]</span>
         <span className="chat-message-user">
           <span style={{ color: message.usercolor }}>{message.user}</span>: </span>
         <span className="chat-message-text">{message.message}</span>
@@ -73,7 +71,7 @@ function ChatInput({ onSubmit, disabled }: { onSubmit: Function, disabled: boole
         placeholder={disabled ? "Connecting..." : "Say something..."}
         ref={inputRef}
         onChange={handleChange} className="chat-input-box" autoFocus={true} disabled={disabled} />
-      <input type="submit" value="Enviar" disabled={disabled} />
+      <input type="submit" value="Send" disabled={disabled} />
     </form>
   )
 }
