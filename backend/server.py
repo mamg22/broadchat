@@ -40,6 +40,7 @@ def process_message(message: dict, context: dict) -> dict:
         case "send":
             return {
                 "type": "message",
+                "message_type": "message",
                 "id": str(uuid.uuid4()),
                 "time": str(datetime.now()),
                 "user": context["user"],
@@ -63,6 +64,15 @@ async def chat_websocket(websocket: WebSocket):
             username = identify["username"]
             usercolor = USER_COLORS[hash(username) % len(USER_COLORS)]
             clients.register(username, websocket)
+            await clients.broadcast(
+                {
+                    "type": "message",
+                    "message_type": "room",
+                    "id": str(uuid.uuid4()),
+                    "user": username,
+                    "action": "join",
+                }
+            )
         else:
             reason = "Required identification packet not provided"
             await websocket.close(4001, reason)
@@ -81,3 +91,12 @@ async def chat_websocket(websocket: WebSocket):
             await clients.broadcast(response)
     except WebSocketDisconnect:
         clients.unregister(username)
+        await clients.broadcast(
+            {
+                "type": "message",
+                "message_type": "room",
+                "id": str(uuid.uuid4()),
+                "user": username,
+                "action": "leave",
+            }
+        )

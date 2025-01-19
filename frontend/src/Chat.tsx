@@ -1,9 +1,10 @@
-import { ChangeEvent, FormEvent, MutableRefObject, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, FormEvent, MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react'
 import './Chat.css'
 
 import ConnectionManager from './ConnectionManager';
 
-type Message = {
+type SimpleMessage = {
+  message_type: "message",
   id: number,
   time: Date,
   user: string,
@@ -11,8 +12,17 @@ type Message = {
   message: string,
 }
 
-function ChatLog({ messages }: { messages: Message[] }) {
-  const messages_elts = messages.map(function(message) {
+type RoomMessage = {
+  message_type: "room",
+  id: number,
+  user: string,
+  action: string,
+}
+
+type Message = SimpleMessage | RoomMessage;
+
+function formatMessage(message: Message): ReactNode {
+  if (message.message_type === "message") {
     return (
       <div className="chat-message" key={message.id}>
         <span className="chat-message-user">
@@ -20,7 +30,32 @@ function ChatLog({ messages }: { messages: Message[] }) {
         <span className="chat-message-text">{message.message}</span>
       </div>
     )
-  });
+  }
+  else if (message.message_type === "room") {
+    let text;
+    if (message.action === "join") {
+      text = `${message.user} has joined the room`;
+    }
+    else if (message.action == "leave") {
+      text = `${message.user} has left the room`;
+    }
+    else {
+      throw new Error(`Unknown room message action '${message.action}'`);
+    }
+
+    return (
+      <div className="chat-message room-message" key={message.id}>
+        {text}
+      </div>
+    )
+  }
+  else {
+    throw Error(`Invalid message type: '${message.message_type}'`, message)
+  }
+}
+
+function ChatLog({ messages }: { messages: Message[] }) {
+  const messages_elts = messages.map(formatMessage);
 
   const logRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
 

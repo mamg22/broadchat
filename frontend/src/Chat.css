@@ -28,6 +28,10 @@
   background: rgba(0, 0, 0, .1);
 }
 
+.chat-message.room-message {
+  background: rgba(255, 255, 0, .075);
+}
+
 .chat-message-user {
   font-weight: bold;
 }
@@ -50,7 +54,7 @@
 
   padding: 0.25rem;
 
-  background-color: white;
+  background-color: light-dark(white, black);
 
   border-radius: 0.5rem;
   border: 2px solid gray;
